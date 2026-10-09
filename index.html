@@ -3,24 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pinterest Clone</title>
+  <title>PinnStar</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <nav class="navbar">
-    <div class="logo">PinVerse</div>
+    <div class="logo">PinnStar</div>
 
-    <!-- Search form. BUG #6 is wired via action + JS below -->
-    <!-- BUG #6: Form redirects to error.html on Enter (no preventDefault on submit) -->
-    <form id="search-form" action="error.html">
+    <form id="search-form">
       <input type="text" id="search-input" placeholder="Search pins..." autocomplete="off" />
       <button type="submit" id="search-btn">🔍</button>
     </form>
 
     <div class="nav-actions">
       <button id="dark-toggle">🌙 Dark Mode</button>
-      <!-- BUG #4: Dead upload button — typo onclick, intentionally no file dialog -->
-      <button id="upload-btn" onclick="uploadIng()">⬆ Upload Pin</button>
+      <!-- CORRECT: onclick="uploadImage()" -->
+      <button id="upload-btn" onclick="downloadImage()">⬆ Upload Pin</button>
       <button id="preview-test-btn" title="My uploads">🖼 My Uploads</button>
       <input type="file" id="file-input" accept="image/*" hidden />
     </div>
@@ -31,12 +29,7 @@
     <p id="preview-title"></p>
   </div>
 
-  <!-- BUG #2: Flex row with nowrap — cards force horizontal overflow, last row off-screen -->
   <main id="pin-container" class="pin-container"></main>
-
-  <!-- Template note: each card also contains this (rendered by JS): -->
-  <!-- BUG #5: Download navigates externally instead of saving local file -->
-  <!-- <a class="download-btn" href="https://pin.it/6lOF3vVip">Download</a> -->
 
   <div id="modal" class="modal hidden">
     <div class="modal-content">

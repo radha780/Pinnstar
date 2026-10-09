@@ -46,7 +46,6 @@ const pins = [
 const container = document.getElementById("pin-container");
 const searchForm = document.getElementById("search-form");
 const searchInput = document.getElementById("search-input");
-const searchButton = document.getElementById("search-btn");
 
 // Render gallery
 function renderPins(list) {
@@ -60,28 +59,39 @@ function renderPins(list) {
       "<div class='card-actions'>" +
       "<button class='save-btn'>Save</button>" +
       "<button class='like-btn'>❤ Like</button>" +
-      // Download now points at THAT image (per owner request); bugginess kept via swapped handlers below (BUG #3).
       "<a class='download-btn' href='" + pin.image + "' download='" + pin.image + "'>Download</a>" +
       "</div>";
 
-    // BUG #8: Click makes pin fall instead of opening modal
+    // Clicking a card opens the modal
     card.addEventListener("click", (e) => {
       if (e.target.classList.contains("save-btn") || e.target.classList.contains("like-btn") || e.target.classList.contains("download-btn")) return;
-      card.classList.add("fall"); // should be: openModal(pin)
+      showErrorScreen(); // BUG 2: blank error screen instead of the modal
+      // CORRECT: openModal(pin);
     });
 
-    // BUG #7: Runaway Save button on hover (card Save only; modal Save stays clickable so BUG #12 is still reachable)
     const saveBtn = card.querySelector(".save-btn");
-    saveBtn.addEventListener("mouseover", () => {
-      const x = Math.random() * 200 - 100;
-      const y = Math.random() * 100 - 50;
-      saveBtn.style.transform = "translate(" + x + "px," + y + "px)";
+    saveBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      expandSave(); // BUG 3: Save takes over the whole page
+      // CORRECT: confettiOverdose();
     });
-    saveBtn.addEventListener("click", (e) => { e.stopPropagation(); confettiOverdose(); });
 
-    // BUG #3: Like vs Download handlers swapped (Like downloads that image, Download likes)
-    card.querySelector(".like-btn").addEventListener("click", (e) => { e.stopPropagation(); handleDownload(pin); });
-    card.querySelector(".download-btn").addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); handleLike(pin, card); });
+    // Like likes the pin; Download is a normal download link
+    // BUG 5: must solve a math question before liking
+    card.querySelector(".like-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!solveMath()) return;
+      handleLike(pin, card);
+    });
+    // CORRECT: card.querySelector(".like-btn").addEventListener("click", (e) => { e.stopPropagation(); handleLike(pin, card); });
+
+    // BUG 4: Download opens the file picker (upload) instead of downloading
+    card.querySelector(".download-btn").addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadImage();
+    });
+    // CORRECT: card.querySelector(".download-btn").addEventListener("click", (e) => { e.stopPropagation(); });
 
     container.appendChild(card);
   });
@@ -97,19 +107,9 @@ function handleLike(pin, card) {
     if (el) { el.classList.remove("heart-pop"); void el.offsetWidth; el.classList.add("heart-pop"); }
   });
 }
-// BUG #3 effect: Like button redirects to that image instead of liking
-function handleDownload(pin) {
-  window.location.href = "assets/billie-eilish-reaction.jpg";
-}
 
-// BUG #10 (new): search swap both ways — red<->blue, cat<->dog, car<->horse
-function swapQuery(q) {
-  const map = { red: "blue", blue: "red", cat: "dog", dog: "cat", car: "horse", horse: "car", cars: "horse", horses: "car" };
-  const words = q.toLowerCase().trim().split(/\s+/).map((w) => map[w] || w);
-  return words.join(" ");
-}
 function filterPins(query) {
-  const q = swapQuery(query || ""); // BUG #10: red<->blue, cat<->dog, car<->horse
+  const q = (query || "").toLowerCase().trim();
   if (!q) return pins;
   return pins.filter((p) => p.title.toLowerCase().includes(q) || p.tags.some((t) => t.includes(q)) || p.color.includes(q));
 }
@@ -117,37 +117,38 @@ function executeSearch() {
   renderPins(filterPins(searchInput.value));
 }
 
-// BUG #6: Listens to click only, no submit+preventDefault -> Enter redirects to error.html
-searchButton.addEventListener("click", (e) => { e.preventDefault(); executeSearch(); });
-
-// BUG #11: Passive-aggressive search overwrites user input on Enter/submit
-searchForm.addEventListener("submit", () => {
-  searchInput.value = "Did you guys just find another bug!?";
+// Search runs on button click and on Enter, without leaving the page
+searchForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  crackWebsite(); // BUG 6: site cracks instead of searching
+  // CORRECT: executeSearch();
 });
 
-// Dark mode toggle (works, but BUG #1 colors are wrong in CSS)
+// Dark mode toggle
 document.getElementById("dark-toggle").addEventListener("click", () => {
   const html = document.documentElement;
   html.dataset.theme = html.dataset.theme === "dark" ? "light" : "dark";
 });
 
-// BUG #4: Upload button intentionally dead (typo onclick uploadIng + NO working listener here).
-// Separate Test Preview button drives the file picker so BUG #9 stays demoable.
+// Upload
 document.getElementById("preview-test-btn").addEventListener("click", () => document.getElementById("file-input").click());
 document.getElementById("file-input").addEventListener("change", previewFile);
 function uploadImage() { document.getElementById("file-input").click(); }
 function previewFile(e) {
   const file = e.target.files[0];
   if (!file) return;
-  // My Uploads preview shows the fixed twitter image (message removed per owner)
-  const img = document.getElementById("preview-img");
-  img.src = "assets/twitter.jpg";
-  img.style.display = "block";
-  document.getElementById("upload-preview").classList.remove("hidden");
-  document.getElementById("preview-title").style.display = "none";
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = document.getElementById("preview-img");
+    img.src = reader.result;
+    img.style.display = "block";
+    document.getElementById("upload-preview").classList.remove("hidden");
+    document.getElementById("preview-title").innerText = file.name;
+  };
+  reader.readAsDataURL(file);
 }
 
-// Modal (never opens from cards because of BUG #8, but code is correct for the fix)
+// Modal
 let currentPin = null;
 function openModal(pin) {
   currentPin = pin;
@@ -160,21 +161,21 @@ function openModal(pin) {
 document.getElementById("modal-close").addEventListener("click", () => {
   document.getElementById("modal").classList.add("hidden");
 });
-// Modal Save stays clickable (no runaway) so BUG #12 confetti is reachable despite BUG #7
 document.getElementById("modal-save").addEventListener("click", (e) => { e.stopPropagation(); confettiOverdose(); });
 document.getElementById("modal-like").addEventListener("click", () => {
   if (!currentPin) return;
+  if (!solveMath()) return; // BUG 5 (CORRECT: delete this line)
   currentPin.likes++;
   document.getElementById("like-count").innerText = currentPin.likes;
 });
 
-// Reverse-scroll bug removed per owner request (no wheel override).
-
-// BUG #12: Confetti overdose - setInterval with no clearInterval, freezes tab
+// Confetti: runs until it fills half the screen height, then stops and clears
+let confettiTimer = null;
 function confettiOverdose() {
+  if (confettiTimer) return; // don't stack multiple intervals
   const box = document.getElementById("confetti-container");
   const colors = ["red", "blue", "green", "yellow", "purple"];
-  setInterval(() => {
+  confettiTimer = setInterval(() => {
     for (let i = 0; i < 5; i++) {
       const c = document.createElement("div");
       c.className = "confetti";
@@ -183,11 +184,92 @@ function confettiOverdose() {
       c.style.top = (box.children.length * 2) + "px";
       box.appendChild(c);
     }
-    // MISSING: if (box.offsetHeight >= window.innerHeight / 2) clearInterval(...)
+    if (box.children.length * 2 >= window.innerHeight / 2) {
+      clearInterval(confettiTimer);
+      confettiTimer = null;
+      setTimeout(() => { box.innerHTML = ""; }, 1000);
+    }
   }, 50);
 }
 
-// Logo (PinVerse) click fires the confetti overdose (BUG #12 reachable from navbar)
+// Logo click fires the confetti
 document.querySelector(".logo").style.cursor = "pointer";
 document.querySelector(".logo").addEventListener("click", confettiOverdose);
+
+// BUG 2: blank error screen
+function showErrorScreen() {
+  document.body.innerHTML =
+    "<div style='height:100vh;background:#fff;color:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Arial;text-align:center'>" +
+    "<h1 style='font-size:48px'>ERROR!</h1><p style='font-size:24px'>This image can't be opened... yayyyyyyyy 🎉</p></div>";
+}
+
+// BUG 3: giant Save screen, never removed until the page is reloaded
+function expandSave() {
+  if (document.getElementById("save-overlay")) return;
+  const big = document.createElement("div");
+  big.id = "save-overlay";
+  big.innerText = "SAVED!!! 📌";
+  document.body.appendChild(big);
+}
+
+// BUG 4: Upload Pin downloads an image instead of opening the file picker
+function downloadImage() {
+  const a = document.createElement("a");
+  a.href = pins[0].image;
+  a.download = "pin.jpg";
+  a.click();
+}
+
+// BUG 5: arithmetic questions before liking
+const mathQuestions = [
+  { q: "889 * 5576 * 45723", a: 889 * 5576 * 45723 },
+  { q: "(1234 + 5678) * 91", a: (1234 + 5678) * 91 },
+  { q: "98765 - 4321 * 12", a: 98765 - 4321 * 12 },
+  { q: "(777 * 888) + (999 * 111)", a: 777 * 888 + 999 * 111 },
+  { q: "12345 * 6789", a: 12345 * 6789 },
+  { q: "(4096 / 64) * 125 + 17", a: (4096 / 64) * 125 + 17 },
+  { q: "2 ** 20 - 1000 * 3", a: 2 ** 20 - 1000 * 3 },
+];
+function solveMath() {
+  const item = mathQuestions[Math.floor(Math.random() * mathQuestions.length)];
+  const answer = prompt("Solve this to like the pin:\n" + item.q + " = ?");
+  if (Number(answer) === item.a) return true;
+  alert("Wrong answer! No like for you 😈");
+  return false;
+}
+
+// BUG 6: dramatic crack. Shakes, cards fall, glass cracks, everything freezes
+function crackWebsite() {
+  document.querySelector(".navbar").classList.add("shake");
+  container.classList.add("shake");
+
+  document.querySelectorAll(".pin-card").forEach((card, i) => {
+    card.style.animationDelay = (i % 10) * 0.08 + "s";
+    card.classList.add("fall");
+  });
+
+  document.querySelectorAll("button, input").forEach((el) => (el.disabled = true));
+
+  const crackPaths = [
+    "50,50 42,38 47,25 38,12 41,0",
+    "50,50 62,40 58,28 70,15 66,0",
+    "50,50 64,56 78,52 88,62 100,58",
+    "50,50 58,66 54,80 66,90 62,100",
+    "50,50 40,60 28,58 18,70 0,66",
+    "50,50 36,44 22,40 10,28 0,30",
+  ];
+  const lines = crackPaths
+    .map((p, i) => "<polyline class='crack-line' style='animation-delay:" + i * 0.12 + "s' points='" + p + "' />")
+    .join("");
+
+  setTimeout(() => {
+    const overlay = document.createElement("div");
+    overlay.id = "crack-overlay";
+    overlay.innerHTML =
+      "<svg viewBox='0 0 100 100' preserveAspectRatio='none'>" + lines + "</svg>" +
+      "<h1>💥 CRACK!!! 💥</h1><p>PinnStar has shattered. Reload the page to try again.</p>";
+    document.body.appendChild(overlay);
+  }, 1200);
+}
+
 renderPins(pins);

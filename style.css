@@ -1,58 +1,123 @@
 :root {
-  --background-color: #ffffff;
-  --text-color: #111111;
-  --card-bg: #f0f0f0;
-  --nav-bg: #ffffff;
+  --background-color: #fdf2f8;  /* blush pink */
+  --text-color: #3d2c4d;        /* soft plum */
+  --card-bg: #f3e8ff;           /* lavender mist */
+  --nav-bg: #ffe0ec;            /* pastel pink */
+  --input-bg: #e9f5ff;          /* baby blue */
+  --border-color: #ead7f5;
+  --accent: #d6336c;            /* raspberry pink */
+
+  --lavender: #e0d0fa;
+  --peach: #ffdcc8;
+  --rose: #ffd0e2;
+  --sky: #cfe8ff;
 }
 
-/* BUG #1: Dark mode uses sunburst teal/cream instead of proper dark tones */
 [data-theme="dark"] {
-  --background-color: #1e5a4c; /* sunburst teal rays (should be #121212) */
-  --text-color: #f5e9be;        /* sunburst cream rays (should be #ffffff) */
-  --card-bg: #1e5a4c;
-  --nav-bg: #f5e9be;
+  --background-color: #121212;
+  --text-color: #ffffff;
+  --card-bg: #1e1e1e;
+  --nav-bg: #1a1a1a;
+  --input-bg: #2c2c2c;
+  --border-color: #333333;
+  --accent: #ff6f9c;
+
+  --lavender: #3b2f5c;
+  --peach: #5a3a2e;
+  --rose: #5c2f45;
+  --sky: #26435f;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--background-color); color: var(--text-color); font-family: Arial, sans-serif; }
+body {
+  background: var(--background-color);
+  color: var(--text-color);
+  font-family: "Quicksand", "Trebuchet MS", sans-serif;
+  font-weight: 500;
+}
+button, input { font-family: inherit; }
 
 .navbar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 20px; background: var(--nav-bg);
-  position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #ddd;
+  padding: 14px 24px; background: var(--nav-bg);
+  position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border-color);
 }
-.logo { font-size: 24px; font-weight: bold; color: #e60023; }
+.logo { font-family: "Pacifico", cursive; font-size: 30px; color: var(--accent); }
 .logo span { color: var(--text-color); }
-#search-form { display: flex; flex: 1; margin: 0 20px; }
-#search-input { flex: 1; padding: 10px; border-radius: 20px 0 0 20px; border: 1px solid #ccc; }
-#search-btn { padding: 10px 16px; border-radius: 0 20px 20px 0; border: 1px solid #ccc; cursor: pointer; }
-.nav-actions button { margin-left: 8px; padding: 10px 14px; border-radius: 20px; border: none; cursor: pointer; }
-#upload-btn { background: #e60023; color: #fff; }
 
-/* BUG #2: Flex nowrap with fixed-width cards + wide container -> guaranteed horizontal overflow */
-.pin-container {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 16px;
-  padding: 20px;
-  width: 1600px;
-  overflow-x: visible;
+/* Shorter, prettier search bar */
+#search-form {
+  display: flex; align-items: center;
+  flex: 0 1 380px; margin: 0 auto;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 4px;
+  box-shadow: 0 4px 14px rgba(214, 51, 108, 0.12);
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
-.pin-card { flex: 0 0 280px; }
+#search-form:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(214, 51, 108, 0.18);
+}
+#search-input {
+  flex: 1; min-width: 0;
+  padding: 10px 16px; font-size: 15px;
+  border: none; outline: none; background: transparent; color: var(--text-color);
+}
+#search-input::placeholder { color: var(--text-color); opacity: 0.5; }
+#search-btn {
+  padding: 10px 20px; font-size: 16px;
+  border: none; border-radius: 999px;
+  background: var(--lavender); color: var(--text-color); cursor: pointer;
+}
+
+/* Bigger buttons, each with its own pastel color */
+.nav-actions { display: flex; align-items: center; gap: 10px; }
+.nav-actions button {
+  padding: 12px 20px; font-size: 15px; font-weight: 700;
+  border-radius: 999px; border: none; cursor: pointer;
+  color: var(--text-color);
+}
+#dark-toggle { background: var(--lavender); }
+#preview-test-btn { background: var(--peach); }
+#upload-btn { background: var(--accent); color: #fff; }
+
+.pin-container {
+  column-width: 300px;
+  column-gap: 16px;
+  padding: 20px;
+}
 
 .pin-card {
-  background: var(--card-bg); border-radius: 12px; overflow: hidden;
+  break-inside: avoid;
+  margin-bottom: 16px;
+  background: var(--card-bg); border-radius: 14px; overflow: hidden;
   cursor: pointer; position: relative; transition: top 1s ease-in;
 }
 .pin-card img { width: 100%; display: block; }
-.pin-info { padding: 10px; }
-.pin-info h3 { font-size: 15px; margin-bottom: 4px; }
-.pin-info small { opacity: 0.7; }
-.card-actions { display: flex; gap: 8px; padding: 0 10px 10px; }
-.save-btn { background: #e60023; color: #fff; border: none; border-radius: 20px; padding: 8px 12px; cursor: pointer; }
-.like-btn, .download-btn { border: 1px solid #ccc; border-radius: 20px; padding: 8px 12px; cursor: pointer; text-decoration: none; color: inherit; background: #fff; }
+.pin-info { padding: 12px; }
+.pin-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.pin-info small { opacity: 0.75; }
+.card-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 12px 12px; }
 
-/* Used by BUG #8 gravity drop — highly visible fall: spins, drops off screen, fades */
+.save-btn, .like-btn, .download-btn {
+  padding: 10px 16px; font-size: 14px; font-weight: 700;
+  border: none; border-radius: 999px; cursor: pointer;
+  text-decoration: none; color: var(--text-color);
+}
+.save-btn { background: var(--accent); color: #fff; }
+.like-btn { background: var(--rose); }
+.download-btn { background: var(--sky); }
+
+.nav-actions button, .save-btn, .like-btn, .download-btn, #search-btn {
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.nav-actions button:hover, .save-btn:hover, .like-btn:hover, .download-btn:hover, #search-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(0.97);
+}
+
 @keyframes fallDrop {
   0% { transform: translateY(0) rotate(0deg); opacity: 1; }
   30% { transform: translateY(60px) rotate(8deg); opacity: 1; }
@@ -63,30 +128,56 @@ body { background: var(--background-color); color: var(--text-color); font-famil
 
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
 .modal.hidden, .hidden { display: none; }
-.modal-content { background: var(--background-color); padding: 20px; border-radius: 12px; max-width: 500px; width: 90%; text-align: center; }
+.modal-content { background: var(--background-color); padding: 20px; border-radius: 14px; max-width: 500px; width: 90%; text-align: center; }
 .modal-content img { width: 100%; border-radius: 8px; }
 #modal-close { float: right; font-size: 28px; cursor: pointer; }
 .modal-actions { margin-top: 12px; display: flex; gap: 10px; justify-content: center; }
 
-.upload-preview {
-  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  z-index: 60; text-align: center; padding: 20px;
-  background: var(--background-color); border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.35); max-width: 90vw;
-}
-.upload-preview img {
-  display: block; margin: 0 auto 16px; max-width: 500px; width: 100%;
-  border-radius: 8px;
-}
-.upload-preview {
-  min-width: 640px; max-width: 92vw;
-}
-.upload-preview p { font-size: 18px; margin-top: 8px; }
+.upload-preview { text-align: center; padding: 12px; }
+.upload-preview img { max-width: 200px; border-radius: 8px; }
 
 #confetti-container { position: fixed; top: 0; left: 0; width: 100%; pointer-events: none; z-index: 99; }
 .confetti { position: absolute; width: 10px; height: 10px; top: 0; }
 
-/* Minimal pop on just the ❤ inside the <small> likes line */
 .pin-info .heart { display: inline-block; }
-@keyframes heartPop { 0% { transform: scale(1); } 40% { transform: scale(1.6); color: #e60023; } 100% { transform: scale(1); } }
+@keyframes heartPop { 0% { transform: scale(1); } 40% { transform: scale(1.6); color: var(--accent); } 100% { transform: scale(1); } }
 .pin-info .heart.heart-pop { animation: heartPop 0.35s ease; }
+
+/* BUG 1: image disappears on hover. CORRECT: delete this rule */
+.pin-card img:hover { opacity: 0; }
+
+/* BUG 3: Save expands over the whole page */
+#save-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12vw; font-weight: 700;
+  animation: growSave 0.6s ease-out;
+}
+@keyframes growSave {
+  from { transform: scale(0.05); border-radius: 50%; }
+  to { transform: scale(1); border-radius: 0; }
+}
+
+/* BUG 6: page shakes and cracks on search */
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-12px, 8px) rotate(-1deg); }
+  40% { transform: translate(10px, -10px) rotate(1deg); }
+  60% { transform: translate(-8px, -6px) rotate(-1deg); }
+  80% { transform: translate(8px, 10px) rotate(1deg); }
+}
+.shake { animation: shake 0.4s linear 3; }
+
+#crack-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0, 0, 0, 0.88); color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+}
+#crack-overlay svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+#crack-overlay h1, #crack-overlay p { position: relative; }
+#crack-overlay h1 { font-size: 64px; }
+#crack-overlay p { font-size: 22px; margin-top: 10px; }
+.crack-line { fill: none; stroke: #fff; stroke-width: 0.6; opacity: 0; animation: crackIn 0.25s forwards; }
+@keyframes crackIn { to { opacity: 1; } }
