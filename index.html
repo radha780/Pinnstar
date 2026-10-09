@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pinterest Clone</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">PinVerse</div>
+
+    <!-- Search form. BUG #6 is wired via action + JS below -->
+    <!-- BUG #6: Form redirects to error.html on Enter (no preventDefault on submit) -->
+    <form id="search-form" action="error.html">
+      <input type="text" id="search-input" placeholder="Search pins..." autocomplete="off" />
+      <button type="submit" id="search-btn">🔍</button>
+    </form>
+
+    <div class="nav-actions">
+      <button id="dark-toggle">🌙 Dark Mode</button>
+      <!-- BUG #4: Dead upload button — typo onclick, intentionally no file dialog -->
+      <button id="upload-btn" onclick="uploadIng()">⬆ Upload Pin</button>
+      <button id="preview-test-btn" title="My uploads">🖼 My Uploads</button>
+      <input type="file" id="file-input" accept="image/*" hidden />
+    </div>
+  </nav>
+
+  <div id="upload-preview" class="upload-preview hidden">
+    <img id="preview-img" src="" alt="preview" />
+    <p id="preview-title"></p>
+  </div>
+
+  <!-- BUG #2: Flex row with nowrap — cards force horizontal overflow, last row off-screen -->
+  <main id="pin-container" class="pin-container"></main>
+
+  <!-- Template note: each card also contains this (rendered by JS): -->
+  <!-- BUG #5: Download navigates externally instead of saving local file -->
+  <!-- <a class="download-btn" href="https://pin.it/6lOF3vVip">Download</a> -->
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <span id="modal-close">&times;</span>
+      <img id="modal-img" src="" alt="pin detail" />
+      <h2 id="modal-title"></h2>
+      <p id="modal-author"></p>
+      <div class="modal-actions">
+        <button class="like-btn" id="modal-like">❤ Like (<span id="like-count">0</span>)</button>
+        <button class="save-btn" id="modal-save">Save Pin</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confetti-container"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
