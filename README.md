@@ -1,4 +1,4 @@
-# 🛠️ Fix the Broken Website — PinVerse
+# 🛠️ Fix the Broken Website — Pinnstar
 
 Welcome to **Fix the Broken Website**, a two-round debugging showdown.
 Your site is broken. Your job: hunt it down, fix it, ship it.
