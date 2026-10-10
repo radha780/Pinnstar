@@ -20,10 +20,4 @@ Your site is broken. Your job: hunt it down, fix it, ship it.
 - Winners decided on correctness, completeness, and speed.
 - Both rounds happen the **same day** — come prepared.
 
-## Your Site: PinVerse 📌
 
-A Pinterest-style gallery in pure **HTML + CSS + JS** (no frameworks).
-
-Run it:
-
-Double-click index.html
