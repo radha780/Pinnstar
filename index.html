@@ -17,7 +17,7 @@
 
     <div class="nav-actions">
       <button id="dark-toggle">🌙 Dark Mode</button>
-      <!-- CORRECT: onclick="uploadImage()" -->
+      <!-- BUG 4: Upload button triggers download function -->
       <button id="upload-btn" onclick="downloadImage()">⬆ Upload Pin</button>
       <button id="preview-test-btn" title="My uploads">🖼 My Uploads</button>
       <input type="file" id="file-input" accept="image/*" hidden />

@@ -13,6 +13,7 @@
   --sky: #cfe8ff;
 }
 
+/* BUG 7: Dark mode turns the entire website upside down */
 [data-theme="dark"] {
   --background-color: #121212;
   --text-color: #ffffff;
@@ -26,6 +27,8 @@
   --peach: #5a3a2e;
   --rose: #5c2f45;
   --sky: #26435f;
+
+  transform: rotate(180deg);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,6 +37,7 @@ body {
   color: var(--text-color);
   font-family: "Quicksand", "Trebuchet MS", sans-serif;
   font-weight: 500;
+  transition: transform 0.5s ease;
 }
 button, input { font-family: inherit; }
 
@@ -42,7 +46,7 @@ button, input { font-family: inherit; }
   padding: 14px 24px; background: var(--nav-bg);
   position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border-color);
 }
-.logo { font-family: "Pacifico", cursive; font-size: 30px; color: var(--accent); }
+.logo { font-family: "Pacifico", cursive; font-size: 30px; color: var(--accent); display: inline-block; }
 .logo span { color: var(--text-color); }
 
 /* Shorter, prettier search bar */
@@ -72,7 +76,7 @@ button, input { font-family: inherit; }
   background: var(--lavender); color: var(--text-color); cursor: pointer;
 }
 
-/* Bigger buttons, each with its own pastel color */
+/* Bigger buttons */
 .nav-actions { display: flex; align-items: center; gap: 10px; }
 .nav-actions button {
   padding: 12px 20px; font-size: 15px; font-weight: 700;
@@ -126,7 +130,7 @@ button, input { font-family: inherit; }
 }
 .pin-card.fall { animation: fallDrop 1.2s ease-in forwards; z-index: 50; }
 
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100; }
 .modal.hidden, .hidden { display: none; }
 .modal-content { background: var(--background-color); padding: 20px; border-radius: 14px; max-width: 500px; width: 90%; text-align: center; }
 .modal-content img { width: 100%; border-radius: 8px; }
@@ -143,10 +147,10 @@ button, input { font-family: inherit; }
 @keyframes heartPop { 0% { transform: scale(1); } 40% { transform: scale(1.6); color: var(--accent); } 100% { transform: scale(1); } }
 .pin-info .heart.heart-pop { animation: heartPop 0.35s ease; }
 
-/* BUG 1: image disappears on hover. CORRECT: delete this rule */
+/* BUG 1: Image disappears on hover */
 .pin-card img:hover { opacity: 0; }
 
-/* BUG 3: Save expands over the whole page */
+/* BUG 3: Save overlay */
 #save-overlay {
   position: fixed; inset: 0; z-index: 500;
   background: var(--accent); color: #fff;
@@ -159,7 +163,7 @@ button, input { font-family: inherit; }
   to { transform: scale(1); border-radius: 0; }
 }
 
-/* BUG 6: page shakes and cracks on search */
+/* BUG 6: Page shakes and shatters */
 @keyframes shake {
   0%, 100% { transform: translate(0, 0); }
   20% { transform: translate(-12px, 8px) rotate(-1deg); }
